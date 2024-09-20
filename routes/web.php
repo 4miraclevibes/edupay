@@ -43,7 +43,7 @@ Route::post('payment/topUpUser', [PaymentController::class, 'topUpUser'])->middl
 Route::get('payment/topUpIndex', [PaymentController::class, 'topUpIndex'])->middleware('auth')->name('payment.topUpIndex');
 Route::post('wallet/store', [WalletController::class, 'store'])->middleware('auth')->name('wallet.store');
 Route::get('transaction/index', [TransactionController::class, 'index'])->middleware('auth')->name('transaction.index');
-
+Route::get('payment/index', [PaymentController::class, 'index'])->middleware('auth')->name('payment.index');
 Route::middleware(['auth', 'admin'])->group(function () {
     //User
     Route::get('user/edit/{id}', [UserController::class, 'edit'])->name('user.edit');
@@ -55,10 +55,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
     
     //Transaction
     Route::post('transaction/store', [TransactionController::class, 'store'])->name('transaction.store');
-    
-    //Payment
-    Route::get('payment/index', [PaymentController::class, 'index'])->name('payment.index');
-    // Route::put('payment/update/{id}', [PaymentController::class, 'update'])->name('payment.update');
     
     //Top UP
     Route::get('topup/index', [TopUpController::class, 'index'])->name('topup.index');
