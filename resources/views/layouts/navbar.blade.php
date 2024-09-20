@@ -83,6 +83,13 @@
                   <div>Top Up</div>
                 </a>
               </li>
+              <!-- Transaction Management -->
+              <li class="menu-item {{ Route::is('transaction.index') ? 'active' : '' }}">
+                <a href="{{ route('transaction.index') }}" class="menu-link">
+                  <i class="menu-icon tf-icons bx bx-transfer-alt"></i>
+                  <div>Transactions</div>
+                </a>
+              </li>
 
               @if (Auth::user()->role->name == 'ADMIN')
               <!-- User Management -->
