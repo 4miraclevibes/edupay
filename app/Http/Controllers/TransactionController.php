@@ -16,7 +16,9 @@ class TransactionController extends Controller
         if(Auth::user()->role->name == 'ADMIN'){
             $data = Transaction::all();
         }else{
-            $data = Transaction::where('user_id', Auth::user()->id)->get();
+            $data = Transaction::whereHas('payment', function($query) {
+                $query->where('user_id', Auth::user()->id);
+            })->get();
         }
         return view('transaction.index', [
             'data' => $data,
