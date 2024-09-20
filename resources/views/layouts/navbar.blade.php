@@ -90,6 +90,13 @@
                   <div>Transactions</div>
                 </a>
               </li>
+              <!-- Payment Management -->
+              <li class="menu-item {{ Route::is('payment.index') ? 'active' : '' }}">
+                <a href="{{ route('payment.index') }}" class="menu-link">
+                  <i class="menu-icon tf-icons bx bx-money"></i>
+                  <div>Payments</div>
+                </a>
+              </li>
 
               @if (Auth::user()->role->name == 'ADMIN')
               <!-- User Management -->

@@ -21,9 +21,15 @@ class PaymentController extends Controller
      */
     public function index()
     {
-        $data = Payment::with([
-            'transaction' => ['transactionDetail'],
-        ])->get();
+        if(Auth::user()->role->name == 'ADMIN'){
+            $data = Payment::with([
+                'transaction' => ['transactionDetail'],
+            ])->get();
+        }else{
+            $data = Payment::where('user_id', Auth::user()->id)->with([
+                'transaction' => ['transactionDetail'],
+            ])->get();
+        }
         return view('payment.index', [
             'data' => $data
         ]);
