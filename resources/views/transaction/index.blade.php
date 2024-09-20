@@ -14,8 +14,10 @@
             <th class="text-white">No</th>
             <th class="text-white">Sender</th>
             <th class="text-white">Receiver</th>
+            <th class="text-white">Service</th>
             <th class="text-white">Total</th>
             <th class="text-white">Status</th>
+
             <th class="text-white">Actions</th>
           </tr>
         </thead>
@@ -25,6 +27,7 @@
             <th scope="row">{{ $loop->iteration }}</th>
             <td>{{ $item->transactionDetail->where('case', 'sender')->first()->user->name ?? '' }}</td>
             <td>{{ $item->transactionDetail->where('case', 'receiver')->first()->user->name ?? '' }}</td>
+            <td>{{ $item->payment->service->name }}</td>
             <td>{{ $item->total }}</td>
             <td>{{ $item->status }}</td>
             <td>

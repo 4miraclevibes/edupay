@@ -40,7 +40,7 @@ class PaymentController extends Controller
      */
     public function topUpIndex()
     {
-        $data = Payment::where('user_id', Auth::user()->id)->with([
+        $data = Payment::where('service_id', 6)->where('user_id', Auth::user()->id)->with([
             'transaction' => ['transactionDetail'],
         ])->get();
         return view('payment.index', [
