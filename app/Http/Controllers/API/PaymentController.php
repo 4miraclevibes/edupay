@@ -249,9 +249,9 @@ class PaymentController extends Controller
     {
         switch ($serviceName) {
             case 'BALIAN':
-                return "http://m.sod.my.id/api/payment/{$code}";
+                return "https://m.sod.my.id/api/payment/{$code}";
             case 'LAYANAN_LAIN':
-                return "http://api.layanan-lain.com/update-payment/{$code}";
+                return "https://api.layanan-lain.com/update-payment/{$code}";
             // Tambahkan case lain untuk layanan lainnya
             default:
                 Log::warning("No API URL defined for service: {$serviceName}");
