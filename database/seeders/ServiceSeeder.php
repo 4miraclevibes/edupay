@@ -46,8 +46,8 @@ class ServiceSeeder extends Seeder
                 'desc' => 'EDUBANK',
             ],
             [
-                'name' => 'SOD',
-                'desc' => 'SOD ARIF HIDROPONIK',
+                'name' => 'BALIAN',
+                'desc' => 'BALIAN',
             ],
         ]);
         $data = Service::all();

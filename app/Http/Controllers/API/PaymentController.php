@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use GuzzleHttp\Client;
 
 class PaymentController extends Controller
 {
@@ -160,6 +162,38 @@ class PaymentController extends Controller
 
                 DB::commit();
 
+                // UPDATE PAYMENT STATUS BASED ON SERVICE
+                if ($item->service) {
+                    $apiUrl = $this->getServiceApiUrl($item->service->name, $item->code);
+                    
+                    if ($apiUrl) {
+                        $data = json_encode(['status' => 'success']);
+                        
+                        $options = [
+                            'http' => [
+                                'header'  => "Content-type: application/json\r\n" .
+                                             "Accept: application/json\r\n",
+                                'method'  => 'POST',
+                                'content' => $data,
+                                'timeout' => 30  // timeout dalam detik
+                            ]
+                        ];
+                        
+                        $context = stream_context_create($options);
+                        try {
+                            $result = file_get_contents($apiUrl, false, $context);
+                            if ($result === FALSE) {
+                                Log::error("Error updating {$item->service->name} payment status: Unable to reach the API");
+                            } else {
+                                $responseBody = json_decode($result, true);
+                                Log::info("{$item->service->name} API response: ", ['body' => $responseBody]);
+                            }
+                        } catch (\Exception $e) {
+                            Log::error("Error updating {$item->service->name} payment status: " . $e->getMessage());
+                        }
+                    }
+                }
+
                 return response()->json([
                     'data' => Payment::with(['transaction.transactionDetail', 'service.feeDetail.fee.user.wallet'])->find($item->id),
                     'message' => 'Sukses',
@@ -209,5 +243,19 @@ class PaymentController extends Controller
             'message' => 'Pembayaran dibatalkan',
             'code' => 200,
         ], 200);
+    }
+
+    private function getServiceApiUrl($serviceName, $code)
+    {
+        switch ($serviceName) {
+            case 'BALIAN':
+                return "http://m.sod.my.id/api/payment/{$code}";
+            case 'LAYANAN_LAIN':
+                return "http://api.layanan-lain.com/update-payment/{$code}";
+            // Tambahkan case lain untuk layanan lainnya
+            default:
+                Log::warning("No API URL defined for service: {$serviceName}");
+                return null;
+        }
     }
 }
