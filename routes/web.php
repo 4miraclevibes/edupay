@@ -42,6 +42,7 @@ Route::patch('/profile', [ProfileController::class, 'update'])->middleware('auth
 Route::post('payment/topUpUser', [PaymentController::class, 'topUpUser'])->middleware('auth')->name('payment.topUpUser');
 Route::get('payment/topUpIndex', [PaymentController::class, 'topUpIndex'])->middleware('auth')->name('payment.topUpIndex');
 Route::post('wallet/store', [WalletController::class, 'store'])->middleware('auth')->name('wallet.store');
+Route::get('transaction/index', [TransactionController::class, 'index'])->middleware('auth')->name('transaction.index');
 
 Route::middleware(['auth', 'admin'])->group(function () {
     //User
@@ -53,7 +54,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::delete('user/destroy/{id}', [UserController::class, 'destroy'])->name('user.destroy');
     
     //Transaction
-    Route::get('transaction/index', [TransactionController::class, 'index'])->name('transaction.index');
     Route::post('transaction/store', [TransactionController::class, 'store'])->name('transaction.store');
     
     //Payment
