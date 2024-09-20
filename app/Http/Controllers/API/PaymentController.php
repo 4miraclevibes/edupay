@@ -164,6 +164,7 @@ class PaymentController extends Controller
 
                 // UPDATE PAYMENT STATUS BASED ON SERVICE
                 if ($item->service) {
+                    dd($item->service->name); 
                     $apiUrl = $this->getServiceApiUrl($item->service->name, $item->code);
                     
                     if ($apiUrl) {
