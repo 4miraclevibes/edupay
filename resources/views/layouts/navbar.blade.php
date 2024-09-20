@@ -114,23 +114,7 @@
                   <div>Roles</div>
                 </a>
               </li>
-
-              <!-- Transaction Management -->
-              <li class="menu-item {{ Route::is('transaction.index') ? 'active' : '' }}">
-                <a href="{{ route('transaction.index') }}" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-transfer-alt"></i>
-                  <div>Transactions</div>
-                </a>
-              </li>
-
-              <!-- Payment Management -->
-              <li class="menu-item {{ Route::is('payment.index') ? 'active' : '' }}">
-                <a href="{{ route('payment.index') }}" class="menu-link">
-                  <i class="menu-icon tf-icons bx bx-money"></i>
-                  <div>Payments</div>
-                </a>
-              </li>
-
+              
               <!-- Top Up Management -->
               <li class="menu-item {{ Route::is('topup.index') ? 'active' : '' }}">
                 <a href="{{ route('topup.index') }}" class="menu-link">
