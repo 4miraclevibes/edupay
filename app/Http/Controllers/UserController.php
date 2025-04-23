@@ -19,7 +19,6 @@ class UserController extends Controller
     public function index()
     {
         $data = User::all();
-        dd($data);
         return view('user.index', [
             'data' => $data,
         ]);
