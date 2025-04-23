@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Profile;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -51,6 +52,11 @@ class UserController extends Controller
             'email' => $request->email,
             'role_id' => $request->role_id,
             'password' => Hash::make($request->password),
+        ]);
+
+        $wallet = Wallet::create([
+            'user_id' => $user->id,
+            'balance' => 0,
         ]);
         
         return redirect()->route('user.index')->with('success', 'SUKSES');
