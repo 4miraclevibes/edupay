@@ -25,7 +25,7 @@
             <th scope="row">{{ $loop->iteration }}</th>
             <td>{{ $item->name }}</td>
             <td>{{ $item->email }}</td>
-            <td>{{ $item->wallet->balance }}</td>
+            <td>{{ $item->wallet->balance ?? 0 }}</td>
             <td>{{ $item->role->name }}</td>
             <td>
               <div class="dropdown">

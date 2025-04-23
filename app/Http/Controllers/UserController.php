@@ -19,6 +19,7 @@ class UserController extends Controller
     public function index()
     {
         $data = User::all();
+        dd($data);
         return view('user.index', [
             'data' => $data,
         ]);
@@ -57,6 +58,7 @@ class UserController extends Controller
         $wallet = Wallet::create([
             'user_id' => $user->id,
             'balance' => 0,
+            'pin' => 123456,
         ]);
         
         return redirect()->route('user.index')->with('success', 'SUKSES');
