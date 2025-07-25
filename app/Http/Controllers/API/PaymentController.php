@@ -20,10 +20,10 @@ class PaymentController extends Controller
 {
     public function index(){
         $data = Payment::with([
-            'transaction', 
-            'user', 
-            'transaction.transactionDetail', 
-            'transaction.transactionDetail.user', 
+            'transaction',
+            'user',
+            'transaction.transactionDetail',
+            'transaction.transactionDetail.user',
             'transaction.transactionDetail.user.wallet'
             ])->get();
 
@@ -71,7 +71,7 @@ class PaymentController extends Controller
                 'status' => 'pending',
             ]);
 
-            
+
             foreach ($feeDetails as $feeDetail) {
                 PaymentFee::create([
                     'payment_id' => $payment->id,
@@ -84,7 +84,7 @@ class PaymentController extends Controller
             $payment->update([
                 'code' => 'TRX-' . $payment->id . mt_rand(00000,99999)
             ]);
-            
+
             DB::commit();
 
             return response()->json([
@@ -100,7 +100,7 @@ class PaymentController extends Controller
             ], 500);
         }
     }
-    
+
     public function paymentSuccess(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
@@ -165,10 +165,10 @@ class PaymentController extends Controller
                 // UPDATE PAYMENT STATUS BASED ON SERVICE
                 if ($item->service) {
                     $apiUrl = $this->getServiceApiUrl($item->service->name, $item->code);
-                    
+
                     if ($apiUrl) {
                         $data = json_encode(['status' => 'success']);
-                        
+
                         $options = [
                             'http' => [
                                 'header'  => "Content-type: application/json\r\n" .
@@ -178,7 +178,7 @@ class PaymentController extends Controller
                                 'timeout' => 30  // timeout dalam detik
                             ]
                         ];
-                        
+
                         $context = stream_context_create($options);
                         try {
                             $result = file_get_contents($apiUrl, false, $context);
@@ -250,8 +250,8 @@ class PaymentController extends Controller
         switch ($serviceName) {
             case 'BALIAN':
                 return "https://m.sod.my.id/api/payment/{$code}";
-            case 'LAYANAN_LAIN':
-                return "https://api.layanan-lain.com/update-payment/{$code}";
+            case 'EDEPOT':
+                return "https://edepot.justputoff.com/payment/{$code}";
             // Tambahkan case lain untuk layanan lainnya
             default:
                 Log::warning("No API URL defined for service: {$serviceName}");

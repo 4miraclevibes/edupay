@@ -26,10 +26,6 @@ class ServiceSeeder extends Seeder
                 'desc' => 'LAUNDRY UNP',
             ],
             [
-                'name' => 'EDEPOT',
-                'desc' => 'EDEPOT',
-            ],
-            [
                 'name' => 'CARWASH',
                 'desc' => 'CARWASH UNP',
             ],
@@ -52,6 +48,10 @@ class ServiceSeeder extends Seeder
             [
                 'name' => 'BALIAN',
                 'desc' => 'BALIAN',
+            ],
+            [
+                'name' => 'EDEPOT',
+                'desc' => 'EDEPOT',
             ],
         ]);
         $data = Service::all();
