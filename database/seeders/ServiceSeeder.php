@@ -26,6 +26,10 @@ class ServiceSeeder extends Seeder
                 'desc' => 'LAUNDRY UNP',
             ],
             [
+                'name' => 'EDEPOT',
+                'desc' => 'EDEPOT',
+            ],
+            [
                 'name' => 'CARWASH',
                 'desc' => 'CARWASH UNP',
             ],
