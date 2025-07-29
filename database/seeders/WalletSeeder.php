@@ -18,7 +18,7 @@ class WalletSeeder extends Seeder
         $data = User::all();
         foreach($data as $item){
             Wallet::create([
-                'balance' => 1000000000,
+                'balance' => 0,
                 'pin' => '123456',
                 'status' => 'normal',
                 'user_id' => $item->id,
