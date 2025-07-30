@@ -21,7 +21,7 @@ Route::get('service/index', [ServiceController::class, 'index']);
 Route::post('webhook', [WebhookController::class, 'update']);
 Route::get('payment/show/{id}', [PaymentController::class, 'show']);
 
-Route::middleware(['auth:sanctum', 'walletStatus'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('user/show', [UserController::class, 'show']);
     Route::put('payment/paymentSuccess/{id}', [PaymentController::class, 'paymentSuccess']);
     Route::put('payment/paymentCancel/{id}', [PaymentController::class, 'paymentCancel']);

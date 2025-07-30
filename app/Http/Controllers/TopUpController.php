@@ -20,7 +20,7 @@ class TopUpController extends Controller
 
     public function store(Request $request){
         $data = $request->only('amount', 'pin', 'method');
-        $pin = Auth::user()->wallet->pin;    
+        $pin = Auth::user()->wallet->pin;
         $validator = Validator::make($data, [
             'amount' => 'required|integer|min:10000',
             'pin' => 'required|digits:6',
@@ -39,7 +39,7 @@ class TopUpController extends Controller
         DB::beginTransaction();
         try {
             $transaction = TopUpTransaction::create([
-                'user_id' => auth()->user()->id,
+                'user_id' => Auth::user()->id,
                 'payment_method_id' => $paymentMethod->id,
                 'code' => 'TRX-' .  mt_rand(00000,99999),
                 'amount' => $request->amount,
@@ -56,7 +56,7 @@ class TopUpController extends Controller
             $transaction->update([
                 'link' => $midtrans['redirect_url']
             ]);
-            
+
             DB::commit();
 
             return back()->with('success', 'Top Up Berhasil');
@@ -89,7 +89,7 @@ class TopUpController extends Controller
             'gross_amount' => $params['amount']
         ];
 
-        $user = auth()->user();
+        $user = Auth::user();
         $splitName = $this->splitName($user->name);
         $customerDetails = [
             'first_name' => $splitName['first_name'],
@@ -111,7 +111,7 @@ class TopUpController extends Controller
     private function splitName($fullName)
     {
         $name = explode(' ', $fullName);
-        
+
         $lastName = count($name)  > 1 ? array_pop($name) : $fullName;
         $firstName = implode(' ', $name);
 
