@@ -18,6 +18,7 @@ Route::get('transaction/index', [TransactionController::class, 'index']);
 Route::get('payment/index', [PaymentController::class, 'index']);
 Route::get('user/index', [UserController::class, 'index']);
 Route::get('service/index', [ServiceController::class, 'index']);
+Route::post('service/storePayment', [ServiceController::class, 'storePayment']);
 Route::post('webhook', [WebhookController::class, 'update']);
 Route::get('payment/show/{id}', [PaymentController::class, 'show']);
 

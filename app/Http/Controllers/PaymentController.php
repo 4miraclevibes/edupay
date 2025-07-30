@@ -116,7 +116,7 @@ class PaymentController extends Controller
             'status' => 'pending',
             'code' => $request->code,
         ]);
-        return back()->with('success', 'Top Up Berhasil');
+        return back()->with('success', 'Berhasil membuat transaksi');
     }
 
     public function paymentSuccess(Request $request)
