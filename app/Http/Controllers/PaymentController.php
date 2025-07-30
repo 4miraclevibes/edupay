@@ -288,9 +288,13 @@ class PaymentController extends Controller
     {
         switch ($serviceName) {
             case 'BALIAN':
-                return "https://m.sod.my.id/api/payment/{$code}";
+                return "https://m.sod.my.id/api/payment-notification/{$code}";
             case 'EDEPOT':
-                return "https://edepot.justputoff.com/payment/{$code}";
+                return "https://edepot.justputoff.com/payment-notification/{$code}";
+            case 'SPORTLODEK':
+                return "https://sportlodek.justputoff.com/payment-notification/{$code}";
+            case 'CAFETARIA':
+                return "https://cafetaria.justputoff.com/payment-notification/{$code}";
             // Tambahkan case lain untuk layanan lainnya
             default:
                 Log::warning("No API URL defined for service: {$serviceName}");
