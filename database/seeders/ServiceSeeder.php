@@ -53,6 +53,10 @@ class ServiceSeeder extends Seeder
                 'name' => 'EDEPOT',
                 'desc' => 'EDEPOT',
             ],
+            [
+                'name' => 'SPORTLODEK',
+                'desc' => 'SPORTLODEK',
+            ],
         ]);
         $data = Service::all();
         $fees = Fee::all();
