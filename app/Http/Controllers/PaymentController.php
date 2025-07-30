@@ -201,6 +201,15 @@ class PaymentController extends Controller
 
                         $context = stream_context_create($options);
                         try {
+                            // Log request yang akan dikirim
+                            Log::info("Mengirim request ke service API", [
+                                'payment_id' => $item->id,
+                                'service' => $item->service->name,
+                                'code' => $item->code,
+                                'api_url' => $apiUrl,
+                                'request_data' => $data
+                            ]);
+
                             $result = file_get_contents($apiUrl, false, $context);
                             if ($result === FALSE) {
                                 Log::error("Error updating {$item->service->name} payment status: Unable to reach the API", [
@@ -216,10 +225,21 @@ class PaymentController extends Controller
                                 ];
                             } else {
                                 $responseBody = json_decode($result, true);
-                                Log::info("{$item->service->name} API response: ", ['body' => $responseBody]);
+                                Log::info("{$item->service->name} API response: ", [
+                                    'payment_id' => $item->id,
+                                    'service' => $item->service->name,
+                                    'code' => $item->code,
+                                    'raw_response' => $result,
+                                    'parsed_response' => $responseBody
+                                ]);
 
                                 // Cek apakah response berhasil
-                                if ($responseBody && isset($responseBody['status']) && $responseBody['status'] === 'success') {
+                                // Response yang diharapkan: {"message": "Payment notification received", "payment_status": "success", ...}
+                                if ($responseBody &&
+                                    isset($responseBody['message']) &&
+                                    $responseBody['message'] === 'Payment notification received' &&
+                                    isset($responseBody['payment_status']) &&
+                                    $responseBody['payment_status'] === 'success') {
                                     $serviceUpdateStatus = [
                                         'success' => true,
                                         'message' => "Berhasil update status ke {$item->service->name}",
@@ -369,7 +389,7 @@ class PaymentController extends Controller
             case 'EDEPOT':
                 return "https://edepot.justputoff.com/payment-notification/{$code}";
             case 'SPORTLODEK':
-                return "https://sportlodek.justputoff.com/payment-notification/{$code}";
+                return "https://sportlodek.justputoff.com/api/payment-notification/{$code}";
             case 'CAFETARIA':
                 return "https://cafetaria.justputoff.com/payment-notification/{$code}";
             // Tambahkan case lain untuk layanan lainnya
@@ -530,14 +550,25 @@ class PaymentController extends Controller
                 ]);
             } else {
                 $responseBody = json_decode($result, true);
+                // Validasi response sesuai format yang diharapkan
+                $isValidResponse = $responseBody &&
+                    isset($responseBody['message']) &&
+                    $responseBody['message'] === 'Payment notification received' &&
+                    isset($responseBody['payment_status']) &&
+                    $responseBody['payment_status'] === 'success';
+
                 return response()->json([
-                    'success' => true,
-                    'message' => "API {$payment->service->name} dapat diakses",
+                    'success' => $isValidResponse,
+                    'message' => $isValidResponse ? "API {$payment->service->name} dapat diakses dan response valid" : "API {$payment->service->name} dapat diakses tapi response tidak sesuai format",
                     'payment_id' => $paymentId,
                     'service' => $payment->service->name,
                     'api_url' => $apiUrl,
                     'response' => $responseBody,
-                    'response_status' => $responseBody && isset($responseBody['status']) ? $responseBody['status'] : 'unknown'
+                    'response_valid' => $isValidResponse,
+                    'expected_format' => [
+                        'message' => 'Payment notification received',
+                        'payment_status' => 'success'
+                    ]
                 ]);
             }
         } catch (\Exception $e) {
