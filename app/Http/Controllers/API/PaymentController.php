@@ -253,7 +253,7 @@ class PaymentController extends Controller
             case 'EDEPOT':
                 return "https://edepot.justputoff.com/payment/{$code}";
             case 'SPORTLODEK':
-                return "https://sportlodek.justputoff.com/payment/{$code}";
+                return "https://sportlodek.justputoff.com/payment-notification/{$code}";
             case 'CAFETARIA':
                 return "https://cafetaria.justputoff.com/payment/{$code}";
             // Tambahkan case lain untuk layanan lainnya
