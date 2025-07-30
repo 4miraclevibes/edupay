@@ -182,6 +182,7 @@ class PaymentController extends Controller
 
 
                 // UPDATE PAYMENT STATUS BASED ON SERVICE
+                $serviceUpdateStatus = null;
                 if ($item->service) {
                     $apiUrl = $this->getServiceApiUrl($item->service->name, $item->code);
 
@@ -202,18 +203,94 @@ class PaymentController extends Controller
                         try {
                             $result = file_get_contents($apiUrl, false, $context);
                             if ($result === FALSE) {
-                                Log::error("Error updating {$item->service->name} payment status: Unable to reach the API");
+                                Log::error("Error updating {$item->service->name} payment status: Unable to reach the API", [
+                                    'payment_id' => $item->id,
+                                    'service' => $item->service->name,
+                                    'code' => $item->code,
+                                    'api_url' => $apiUrl
+                                ]);
+                                $serviceUpdateStatus = [
+                                    'success' => false,
+                                    'message' => "Gagal menghubungi API {$item->service->name}",
+                                    'service' => $item->service->name
+                                ];
                             } else {
                                 $responseBody = json_decode($result, true);
                                 Log::info("{$item->service->name} API response: ", ['body' => $responseBody]);
+
+                                // Cek apakah response berhasil
+                                if ($responseBody && isset($responseBody['status']) && $responseBody['status'] === 'success') {
+                                    $serviceUpdateStatus = [
+                                        'success' => true,
+                                        'message' => "Berhasil update status ke {$item->service->name}",
+                                        'service' => $item->service->name,
+                                        'response' => $responseBody
+                                    ];
+                                    Log::info("Service update berhasil", [
+                                        'payment_id' => $item->id,
+                                        'service' => $item->service->name,
+                                        'code' => $item->code,
+                                        'response' => $responseBody
+                                    ]);
+                                } else {
+                                    $serviceUpdateStatus = [
+                                        'success' => false,
+                                        'message' => "Response tidak valid dari {$item->service->name}",
+                                        'service' => $item->service->name,
+                                        'response' => $responseBody
+                                    ];
+                                    Log::warning("Service update gagal - response tidak valid", [
+                                        'payment_id' => $item->id,
+                                        'service' => $item->service->name,
+                                        'code' => $item->code,
+                                        'response' => $responseBody
+                                    ]);
+                                }
                             }
                         } catch (\Exception $e) {
-                            Log::error("Error updating {$item->service->name} payment status: " . $e->getMessage());
+                            Log::error("Error updating {$item->service->name} payment status: " . $e->getMessage(), [
+                                'payment_id' => $item->id,
+                                'service' => $item->service->name,
+                                'code' => $item->code,
+                                'api_url' => $apiUrl,
+                                'error' => $e->getMessage()
+                            ]);
+                            $serviceUpdateStatus = [
+                                'success' => false,
+                                'message' => "Error: " . $e->getMessage(),
+                                'service' => $item->service->name
+                            ];
                         }
+                    } else {
+                        Log::warning("URL API tidak ditemukan untuk service", [
+                            'payment_id' => $item->id,
+                            'service' => $item->service->name,
+                            'code' => $item->code
+                        ]);
+                        $serviceUpdateStatus = [
+                            'success' => false,
+                            'message' => "URL API tidak ditemukan untuk service {$item->service->name}",
+                            'service' => $item->service->name
+                        ];
                     }
+                } else {
+                    Log::info("Tidak ada service yang terkait dengan transaksi", [
+                        'payment_id' => $item->id,
+                        'code' => $item->code
+                    ]);
+                    $serviceUpdateStatus = [
+                        'success' => false,
+                        'message' => "Tidak ada service yang terkait dengan transaksi ini",
+                        'service' => null
+                    ];
                 }
 
-                return back()->with('success', 'Transaksi berhasil');
+                // Tampilkan pesan berdasarkan status service update
+                if ($serviceUpdateStatus['success']) {
+                    return back()->with('success', 'Transaksi berhasil. ' . $serviceUpdateStatus['message']);
+                } else {
+                    return back()->with('warning', 'Transaksi berhasil, namun: ' . $serviceUpdateStatus['message']);
+                }
             } elseif ($status == 'cancel') {
                 return response()->json([
                     'message' => 'Transaksi dibatalkan',
@@ -299,6 +376,179 @@ class PaymentController extends Controller
             default:
                 Log::warning("No API URL defined for service: {$serviceName}");
                 return null;
+        }
+    }
+
+    /**
+     * Get detailed service update status for debugging/monitoring
+     */
+    public function getServiceUpdateStatus($paymentId)
+    {
+        // Jika request ingin JSON response
+        if (request()->wantsJson()) {
+            return $this->getServiceUpdateStatusJson($paymentId);
+        }
+
+        // Jika request ingin view
+        $payment = Payment::with('service')->find($paymentId);
+
+        if (!$payment) {
+            return back()->with('error', 'Payment tidak ditemukan');
+        }
+
+        if (!$payment->service) {
+            $serviceStatus = [
+                'success' => false,
+                'message' => 'Tidak ada service yang terkait dengan payment ini',
+                'payment_id' => $paymentId,
+                'service' => null
+            ];
+        } else {
+            $apiUrl = $this->getServiceApiUrl($payment->service->name, $payment->code);
+
+            if (!$apiUrl) {
+                $serviceStatus = [
+                    'success' => false,
+                    'message' => "URL API tidak ditemukan untuk service {$payment->service->name}",
+                    'payment_id' => $paymentId,
+                    'service' => $payment->service->name,
+                    'api_url' => null
+                ];
+            } else {
+                // Test koneksi ke API
+                $data = json_encode(['status' => 'test']);
+                $options = [
+                    'http' => [
+                        'header'  => "Content-type: application/json\r\n" .
+                                     "Accept: application/json\r\n",
+                        'method'  => 'POST',
+                        'content' => $data,
+                        'timeout' => 10
+                    ]
+                ];
+
+                $context = stream_context_create($options);
+
+                try {
+                    $result = file_get_contents($apiUrl, false, $context);
+                    if ($result === FALSE) {
+                        $serviceStatus = [
+                            'success' => false,
+                            'message' => "Gagal menghubungi API {$payment->service->name}",
+                            'payment_id' => $paymentId,
+                            'service' => $payment->service->name,
+                            'api_url' => $apiUrl,
+                            'error' => 'Connection failed'
+                        ];
+                    } else {
+                        $responseBody = json_decode($result, true);
+                        $serviceStatus = [
+                            'success' => true,
+                            'message' => "API {$payment->service->name} dapat diakses",
+                            'payment_id' => $paymentId,
+                            'service' => $payment->service->name,
+                            'api_url' => $apiUrl,
+                            'response' => $responseBody,
+                            'response_status' => $responseBody && isset($responseBody['status']) ? $responseBody['status'] : 'unknown'
+                        ];
+                    }
+                } catch (\Exception $e) {
+                    $serviceStatus = [
+                        'success' => false,
+                        'message' => "Error saat mengakses API: " . $e->getMessage(),
+                        'payment_id' => $paymentId,
+                        'service' => $payment->service->name,
+                        'api_url' => $apiUrl,
+                        'error' => $e->getMessage()
+                    ];
+                }
+            }
+        }
+
+        return view('payment.service-status', compact('serviceStatus'));
+    }
+
+    /**
+     * Get service update status as JSON response
+     */
+    private function getServiceUpdateStatusJson($paymentId)
+    {
+        $payment = Payment::with('service')->find($paymentId);
+
+        if (!$payment) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Payment tidak ditemukan'
+            ], 404);
+        }
+
+        if (!$payment->service) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada service yang terkait dengan payment ini',
+                'payment_id' => $paymentId,
+                'service' => null
+            ]);
+        }
+
+        $apiUrl = $this->getServiceApiUrl($payment->service->name, $payment->code);
+
+        if (!$apiUrl) {
+            return response()->json([
+                'success' => false,
+                'message' => "URL API tidak ditemukan untuk service {$payment->service->name}",
+                'payment_id' => $paymentId,
+                'service' => $payment->service->name,
+                'api_url' => null
+            ]);
+        }
+
+        // Test koneksi ke API
+        $data = json_encode(['status' => 'test']);
+        $options = [
+            'http' => [
+                'header'  => "Content-type: application/json\r\n" .
+                             "Accept: application/json\r\n",
+                'method'  => 'POST',
+                'content' => $data,
+                'timeout' => 10
+            ]
+        ];
+
+        $context = stream_context_create($options);
+
+        try {
+            $result = file_get_contents($apiUrl, false, $context);
+            if ($result === FALSE) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Gagal menghubungi API {$payment->service->name}",
+                    'payment_id' => $paymentId,
+                    'service' => $payment->service->name,
+                    'api_url' => $apiUrl,
+                    'error' => 'Connection failed'
+                ]);
+            } else {
+                $responseBody = json_decode($result, true);
+                return response()->json([
+                    'success' => true,
+                    'message' => "API {$payment->service->name} dapat diakses",
+                    'payment_id' => $paymentId,
+                    'service' => $payment->service->name,
+                    'api_url' => $apiUrl,
+                    'response' => $responseBody,
+                    'response_status' => $responseBody && isset($responseBody['status']) ? $responseBody['status'] : 'unknown'
+                ]);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => "Error saat mengakses API: " . $e->getMessage(),
+                'payment_id' => $paymentId,
+                'service' => $payment->service->name,
+                'api_url' => $apiUrl,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 }

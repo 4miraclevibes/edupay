@@ -37,6 +37,8 @@ Route::delete('/profile', function () {
     return dd('bapak mu');
 })->middleware(['auth', 'verified'])->name('profile.destroy');
 Route::put('payment/paymentSuccess', [PaymentController::class, 'paymentSuccess'])->middleware('auth')->name('payment.paymentSuccess');
+Route::get('payment/service-status/{id}', [PaymentController::class, 'getServiceUpdateStatus'])->middleware('auth')->name('payment.serviceStatus');
+Route::get('payment/service-status-view/{id}', [PaymentController::class, 'getServiceUpdateStatus'])->middleware('auth')->name('payment.serviceStatusView');
 Route::get('/profile', [ProfileController::class, 'edit'])->middleware('auth')->name('profile.edit');
 Route::patch('/profile', [ProfileController::class, 'update'])->middleware('auth')->name('profile.update');
 Route::post('payment/topUpUser', [PaymentController::class, 'topUpUser'])->middleware('auth')->name('payment.topUpUser');
@@ -52,21 +54,21 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('user/store', [UserController::class, 'store'])->name('user.store');
     Route::put('user/update/{id}', [UserController::class, 'update'])->name('user.update');
     Route::delete('user/destroy/{id}', [UserController::class, 'destroy'])->name('user.destroy');
-    
+
     //Transaction
     Route::post('transaction/store', [TransactionController::class, 'store'])->name('transaction.store');
-    
+
     //Top UP
     Route::get('topup/index', [TopUpController::class, 'index'])->name('topup.index');
     Route::post('topup/store', [TopUpController::class, 'store'])->name('topup.store');
-    
+
     //Service
     Route::get('service/index', [ServiceController::class, 'index'])->name('service.index');
     Route::get('service/create', [ServiceController::class, 'create'])->name('service.create');
     Route::get('service/edit/{id}', [ServiceController::class, 'edit'])->name('service.edit');
     Route::post('service/store', [ServiceController::class, 'store'])->name('service.store');
     Route::put('service/update/{id}', [ServiceController::class, 'update'])->name('service.update');
-    
+
     //Fee
     Route::get('fee/index', [FeeController::class, 'index'])->name('fee.index');
     Route::get('fee/create', [FeeController::class, 'create'])->name('fee.create');
