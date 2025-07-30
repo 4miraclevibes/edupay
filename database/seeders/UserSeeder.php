@@ -45,9 +45,21 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password')
             ],
             [
-                'name' => 'sportlodek',
+                'name' => 'Ahmad Futsal Center',
+                'email' => 'ahmad@futsal.com',
                 'role_id' => 3,
-                'email' => 'sportlodek@example.com',
+                'password' => Hash::make('password')
+            ],
+            [
+                'name' => 'Budi Sport Center',
+                'email' => 'budi@sport.com',
+                'role_id' => 3,
+                'password' => Hash::make('password')
+            ],
+            [
+                'name' => 'Citra Futsal Arena',
+                'email' => 'citra@arena.com',
+                'role_id' => 3,
                 'password' => Hash::make('password')
             ],
             [
