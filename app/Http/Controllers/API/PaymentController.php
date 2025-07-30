@@ -252,6 +252,10 @@ class PaymentController extends Controller
                 return "https://m.sod.my.id/api/payment/{$code}";
             case 'EDEPOT':
                 return "https://edepot.justputoff.com/payment/{$code}";
+            case 'SPORTLODEK':
+                return "https://sportlodek.justputoff.com/payment/{$code}";
+            case 'CAFETARIA':
+                return "https://cafetaria.justputoff.com/payment/{$code}";
             // Tambahkan case lain untuk layanan lainnya
             default:
                 Log::warning("No API URL defined for service: {$serviceName}");
