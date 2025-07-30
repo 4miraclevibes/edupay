@@ -22,12 +22,14 @@ class PaymentController extends Controller
     public function index()
     {
         if(Auth::user()->role->name == 'ADMIN'){
-            $data = Payment::with([
-                'transaction' => ['transactionDetail'],
+            $data = TransactionDetail::with([
+                'transaction' => ['payment' => ['service', 'user']],
+                'user'
             ])->get();
         }else{
-            $data = Payment::where('user_id', Auth::user()->id)->with([
-                'transaction' => ['transactionDetail'],
+            $data = TransactionDetail::where('user_id', Auth::user()->id)->with([
+                'transaction' => ['payment' => ['service', 'user']],
+                'user'
             ])->get();
         }
         return view('payment.index', [
