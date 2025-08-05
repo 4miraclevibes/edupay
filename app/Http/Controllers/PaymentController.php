@@ -392,8 +392,8 @@ class PaymentController extends Controller
                 return "https://edepot.justputoff.com/api/payment-notification/{$code}";
             case 'SPORTLODEK':
                 return "https://sportlodek.justputoff.com/api/payment-notification/{$code}";
-            case 'CAFETARIA':
-                return "https://cafetaria.justputoff.com/api/payment-notification/{$code}";
+            case 'ETUKANG':
+                return "https://etukang.justputoff.com/api/payment-notification/{$code}";
             // Tambahkan case lain untuk layanan lainnya
             default:
                 Log::warning("No API URL defined for service: {$serviceName}");

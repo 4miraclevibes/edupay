@@ -18,10 +18,6 @@ class ServiceSeeder extends Seeder
     {
         DB::table('services')->insert([
             [
-                'name' => 'CAFETARIA',
-                'desc' => 'CAFETARIA UNP',
-            ],
-            [
                 'name' => 'LAUNDRY',
                 'desc' => 'LAUNDRY UNP',
             ],
@@ -56,6 +52,10 @@ class ServiceSeeder extends Seeder
             [
                 'name' => 'SPORTLODEK',
                 'desc' => 'SPORTLODEK',
+            ],
+            [
+                'name' => 'ETUKANG',
+                'desc' => 'ETUKANG',
             ],
         ]);
         $data = Service::all();
