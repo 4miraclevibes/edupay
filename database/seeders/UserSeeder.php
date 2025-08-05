@@ -80,6 +80,24 @@ class UserSeeder extends Seeder
                 'email' => 'fee.collector@example.com',
                 'password' => Hash::make('password')
             ],
+            [
+                'name' => 'Ahmad Teknisi',
+                'email' => 'ahmad@teknisi.com',
+                'password' => Hash::make('password'),
+                'role_id' => 3,
+            ],
+            [
+                'name' => 'Budi Jasa',
+                'email' => 'budi@jasa.com',
+                'password' => Hash::make('password'),
+                'role_id' => 3,
+            ],
+            [
+                'name' => 'Citra Service',
+                'email' => 'citra@service.com',
+                'password' => Hash::make('password'),
+                'role_id' => 3,
+            ],
         ]);
     }
 }
