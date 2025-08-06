@@ -48,6 +48,7 @@ class PaymentController extends Controller
         return view('payment.index', [
             'data' => $data
         ]);
+
     }
 
     public function topUpUser(Request $request)

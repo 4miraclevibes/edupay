@@ -16,7 +16,6 @@
             <th class="text-white">Nama</th>
             <th class="text-white">Service</th>
             <th class="text-white">Payment Code</th>
-            <th class="text-white">Transaction Code</th>
             <th class="text-white">Amount</th>
             <th class="text-white">Case</th>
             <th class="text-white">Status</th>
@@ -28,10 +27,9 @@
             <th scope="row">{{ $loop->iteration }}</th>
             <td>{{ $item->created_at ? $item->created_at->format('d/m/Y H:i') : '-' }}</td>
             <td>{{ $item->user->name ?? '-' }}</td>
-            <td>{{ $item->transaction->payment->service->name ?? '-' }}</td>
-            <td>{{ $item->transaction->payment->code ?? '-' }}</td>
-            <td>{{ $item->transaction->transaction_code ?? '-' }}</td>
-            <td>Rp {{ number_format($item->amount, 0, ',', '.') }}</td>
+            <td>{{ $item->service->name ?? '-' }}</td>
+            <td>{{ $item->code ?? '-' }}</td>
+            <td>Rp {{ number_format($item->total, 0, ',', '.') }}</td>
             <td>{{ $item->case ?? '-' }}</td>
             <td>
               @if($item->status == 'success')
